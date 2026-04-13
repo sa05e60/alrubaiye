@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Upload, Mic, Lock, FileText, DollarSign, Package, Palette, ChevronDown, X, Sparkles, Shield, Clock, Star } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { Upload, Mic, Lock, FileText, DollarSign, Package, Palette, ChevronDown, X, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'motion/react';
 import logo from '../imports/logo.png';
 
 const services = [
@@ -10,12 +10,6 @@ const services = [
   { value: 'posters', label: 'ملصقات', icon: '📋', multiplier: 2.0 },
   { value: 'stickers', label: 'ستيكرات', icon: '🏷️', multiplier: 0.8 },
   { value: 'packaging', label: 'تغليف', icon: '📦', multiplier: 3.0 },
-];
-
-const features = [
-  { icon: Shield, title: 'جودة مضمونة', desc: 'أعلى معايير الطباعة' },
-  { icon: Clock, title: 'تسليم سريع', desc: 'خلال 24-48 ساعة' },
-  { icon: Star, title: 'خبرة عريقة', desc: '+15 سنة في السوق' },
 ];
 
 export default function App() {
@@ -29,23 +23,23 @@ export default function App() {
   const [estimatedPrice, setEstimatedPrice] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [activeSection, setActiveSection] = useState(0);
+
+  // Interactive mouse glow background
+  const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 500);
+  const mouseY = useMotionValue(typeof window !== "undefined" ? window.innerHeight / 2 : 500);
+  const smoothX = useSpring(mouseX, { damping: 50, stiffness: 400 });
+  const smoothY = useSpring(mouseY, { damping: 50, stiffness: 400 });
+  const backgroundGlow = useMotionTemplate`radial-gradient(600px circle at ${smoothX}px ${smoothY}px, rgba(11, 61, 111, 0.08), transparent 80%)`;
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const idx = Number(entry.target.getAttribute('data-section'));
-            if (!isNaN(idx)) setActiveSection(idx);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    document.querySelectorAll('[data-section]').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -62,17 +56,29 @@ export default function App() {
 
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    // Recalculate price after setting files (using timeout to let state update, or calculating with new array directly)
+    const updatedFiles = uploadedFiles.filter((_, i) => i !== index);
+    let basePrice = 5000;
+    const service = services.find((s) => s.value === formData.serviceType);
+    if (service) basePrice *= service.multiplier;
+    basePrice += updatedFiles.length * 1000;
+    setEstimatedPrice(basePrice);
   };
 
   const calculatePrice = (data: typeof formData) => {
-    let basePrice = 50;
+    let basePrice = 5000;
     const service = services.find((s) => s.value === data.serviceType);
     if (service) {
       basePrice *= service.multiplier;
     }
-    basePrice += uploadedFiles.length * 10;
+    basePrice += uploadedFiles.length * 1000; // Adjusted file cost to 1000 IQD to match base 5000
     setEstimatedPrice(basePrice);
   };
+
+  // Recalculate initially and on file changes
+  useEffect(() => {
+    calculatePrice(formData);
+  }, [uploadedFiles]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,44 +91,43 @@ export default function App() {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background text-foreground overflow-x-hidden" style={{ fontFamily: "'Almarai', sans-serif" }}>
+    <div dir="rtl" className="min-h-screen bg-background text-foreground overflow-x-hidden relative" style={{ fontFamily: "'Almarai', sans-serif" }}>
       {/* Brand stripe at top */}
       <div className="brand-stripe fixed top-0 left-0 right-0 z-50" />
 
-      {/* Decorative background orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-[0.04]" 
+      {/* Interactive mouse tracking background glow */}
+      <motion.div 
+        className="fixed inset-0 pointer-events-none z-0" 
+        style={{ background: backgroundGlow }} 
+      />
+
+      {/* Static decorative background orbs (subtle) */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-[0.03]" 
           style={{ background: 'radial-gradient(circle, #C41E30 0%, transparent 70%)' }} />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full opacity-[0.04]" 
+        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full opacity-[0.03]" 
           style={{ background: 'radial-gradient(circle, #D4A950 0%, transparent 70%)' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.02]" 
-          style={{ background: 'radial-gradient(circle, #0B3D6F 0%, transparent 70%)' }} />
       </div>
 
-      {/* Geometric pattern overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.025]" style={{
-        backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(214, 162, 83, 0.15) 35px, rgba(214, 162, 83, 0.15) 70px)`
-      }} />
-
-      <div className="relative z-10 max-w-lg mx-auto px-4 py-8 pt-6">
+      <div className="relative z-10 max-w-lg mx-auto px-4 py-8 pt-10">
         {/* Header with logo */}
         <motion.header
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-8 text-center"
+          className="mb-10 text-center"
         >
           <div className="relative inline-block mb-4">
             <div className="absolute inset-0 bg-brand-navy/5 rounded-3xl blur-xl scale-110" />
-            <div className="relative bg-white/90 backdrop-blur-xl px-10 py-5 rounded-2xl shadow-xl border border-brand-gold/20">
-              <img src={logo} alt="Al-Rubeiy Group" className="h-14 mix-blend-multiply" />
+            <div className="relative bg-white/90 backdrop-blur-xl px-10 py-5 rounded-2xl shadow-xl border border-brand-gold/30">
+              <img src={logo} alt="Al-Rubeiy Group" className="h-16 mix-blend-multiply" />
             </div>
           </div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-2xl font-bold text-brand-navy mb-1"
+            className="text-2xl font-bold text-brand-navy mb-2"
           >
             خدمات الطباعة الاحترافية
           </motion.h1>
@@ -136,104 +141,54 @@ export default function App() {
           </motion.p>
         </motion.header>
 
-        {/* Feature badges */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="grid grid-cols-3 gap-3 mb-8"
-        >
-          {features.map((feature, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 + i * 0.1 }}
-              className="glass-card rounded-2xl p-3 text-center card-hover group cursor-default"
-            >
-              <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-brand-navy/10 to-brand-crimson/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="w-5 h-5 text-brand-navy" />
-              </div>
-              <p className="text-xs font-bold text-foreground leading-tight">{feature.title}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{feature.desc}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Progress Indicators */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="flex items-center justify-center gap-2 mb-6"
-        >
-          {['معلومات', 'تصاميم', 'تسعير'].map((label, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${
-                activeSection >= i
-                  ? 'bg-brand-navy text-white shadow-md shadow-brand-navy/20'
-                  : 'bg-muted text-muted-foreground'
-              }`}>
-                <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">{i + 1}</span>
-                {label}
-              </div>
-              {i < 2 && (
-                <div className={`w-6 h-0.5 rounded-full transition-colors duration-300 ${
-                  activeSection > i ? 'bg-brand-navy' : 'bg-muted'
-                }`} />
-              )}
-            </div>
-          ))}
-        </motion.div>
-
         {/* Main Form */}
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
           onSubmit={handleSubmit}
-          className="space-y-5"
+          className="space-y-6"
         >
           {/* Order Information Card */}
           <motion.div
-            data-section="0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="glass-card rounded-3xl p-6 shadow-xl card-hover"
-            style={{ borderTop: '3px solid #0B3D6F' }}
+            className="glass-card rounded-3xl p-6 shadow-xl card-hover relative overflow-hidden group"
           >
-            <h2 className="text-xl font-bold text-brand-navy mb-5 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-brand-navy/10 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-brand-navy" />
+            <div className="absolute top-0 right-0 w-full h-1 bg-brand-navy transition-all duration-300 opacity-50 group-hover:opacity-100" />
+            
+            <h2 className="text-xl font-bold text-brand-navy mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-brand-navy/10 flex items-center justify-center transition-transform group-hover:scale-110">
+                <FileText className="w-5 h-5 text-brand-navy" />
               </div>
               معلومات الطلب
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               {/* Name */}
-              <div className="group">
+              <div className="group/input">
                 <label className="block text-sm font-bold text-foreground mb-2">الاسم الكامل</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full bg-input-background border border-input rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none text-sm"
+                  className="w-full bg-white/50 backdrop-blur-sm border border-input rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:bg-white focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none text-sm shadow-sm"
                   placeholder="أدخل اسمك الكامل"
                   required
                 />
               </div>
 
               {/* Phone */}
-              <div className="group">
+              <div className="group/input">
                 <label className="block text-sm font-bold text-foreground mb-2">رقم الهاتف</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full bg-input-background border border-input rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none text-sm"
+                  className="w-full bg-white/50 backdrop-blur-sm border border-input rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:bg-white focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none text-sm shadow-sm"
                   placeholder="+964 XXX XXX XXXX"
                   dir="ltr"
                   required
@@ -241,14 +196,14 @@ export default function App() {
               </div>
 
               {/* Service Type - Custom Select */}
-              <div>
+              <div className="group/input">
                 <label className="block text-sm font-bold text-foreground mb-2">نوع الخدمة</label>
                 <div className="relative">
                   <select
                     name="serviceType"
                     value={formData.serviceType}
                     onChange={handleInputChange}
-                    className="w-full bg-input-background border border-input rounded-xl px-4 py-3.5 text-foreground focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none appearance-none text-sm"
+                    className="w-full bg-white/50 backdrop-blur-sm border border-input rounded-xl px-4 py-3.5 text-foreground focus:bg-white focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none appearance-none text-sm shadow-sm"
                     required
                   >
                     <option value="">اختر نوع الخدمة</option>
@@ -256,19 +211,19 @@ export default function App() {
                       <option key={s.value} value={s.value}>{s.icon} {s.label}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
 
               {/* Description */}
-              <div>
+              <div className="group/input">
                 <label className="block text-sm font-bold text-foreground mb-2">وصف الطلب</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full bg-input-background border border-input rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none resize-none text-sm"
+                  className="w-full bg-white/50 backdrop-blur-sm border border-input rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:bg-white focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/20 transition-all outline-none resize-none text-sm shadow-sm"
                   placeholder="اشرح تفاصيل طلبك هنا... (الكمية، الحجم، الألوان المطلوبة)"
                   required
                 />
@@ -278,16 +233,16 @@ export default function App() {
 
           {/* Upload Assets Card */}
           <motion.div
-            data-section="1"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="glass-card rounded-3xl p-6 shadow-xl card-hover"
-            style={{ borderTop: '3px solid #C41E30' }}
+            className="glass-card rounded-3xl p-6 shadow-xl card-hover relative overflow-hidden group"
           >
-            <h2 className="text-xl font-bold text-brand-crimson mb-5 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-brand-crimson/10 flex items-center justify-center">
-                <Palette className="w-4 h-4 text-brand-crimson" />
+            <div className="absolute top-0 right-0 w-full h-1 bg-brand-crimson transition-all duration-300 opacity-50 group-hover:opacity-100" />
+            
+            <h2 className="text-xl font-bold text-brand-crimson mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-brand-crimson/10 flex items-center justify-center transition-transform group-hover:scale-110">
+                <Palette className="w-5 h-5 text-brand-crimson" />
               </div>
               تحميل التصاميم
             </h2>
@@ -296,9 +251,9 @@ export default function App() {
               <motion.div
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                className="border-2 border-dashed border-brand-crimson/30 rounded-2xl p-8 text-center hover:border-brand-crimson/50 hover:bg-brand-crimson/5 transition-all duration-300"
+                className="border-2 border-dashed border-brand-crimson/30 rounded-2xl p-8 text-center bg-white/40 hover:border-brand-crimson/50 hover:bg-brand-crimson/5 transition-all duration-300"
               >
-                <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-brand-crimson/10 to-brand-gold/10 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-brand-crimson/10 to-brand-gold/10 flex items-center justify-center shadow-inner">
                   <Upload className="w-8 h-8 text-brand-crimson" />
                 </div>
                 <p className="text-brand-crimson font-bold mb-1">انقر لتحميل ملفات التصميم</p>
@@ -319,7 +274,7 @@ export default function App() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 space-y-2"
+                  className="mt-5 space-y-2"
                 >
                   {uploadedFiles.map((file, index) => (
                     <motion.div
@@ -328,19 +283,21 @@ export default function App() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="flex items-center gap-2 bg-brand-crimson/5 rounded-xl px-3 py-2.5 border border-brand-crimson/10 group"
+                      className="flex items-center gap-3 bg-white/70 backdrop-blur-md rounded-xl px-4 py-3 border border-brand-crimson/10 group/file shadow-sm"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-brand-crimson/10 flex items-center justify-center shrink-0">
-                        <FileText className="w-4 h-4 text-brand-crimson" />
+                      <div className="w-10 h-10 rounded-lg bg-brand-crimson/10 flex items-center justify-center shrink-0">
+                        <FileText className="w-5 h-5 text-brand-crimson" />
                       </div>
-                      <span className="text-sm text-foreground flex-1 truncate">{file.name}</span>
-                      <span className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-foreground truncate">{file.name}</p>
+                        <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</p>
+                      </div>
                       <button
                         type="button"
                         onClick={() => removeFile(index)}
-                        className="w-6 h-6 rounded-full hover:bg-brand-crimson/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 flex items-center justify-center opacity-0 group-hover/file:opacity-100 transition-opacity"
                       >
-                        <X className="w-3 h-3 text-brand-crimson" />
+                        <X className="w-4 h-4 text-red-500" />
                       </button>
                     </motion.div>
                   ))}
@@ -351,47 +308,47 @@ export default function App() {
 
           {/* Pricing Algorithm Card */}
           <motion.div
-            data-section="2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             className="rounded-3xl p-6 shadow-xl card-hover overflow-hidden relative"
             style={{ 
               borderTop: '3px solid #D4A950',
-              background: 'linear-gradient(135deg, rgba(212, 169, 80, 0.06) 0%, rgba(212, 169, 80, 0.02) 100%)',
-              backdropFilter: 'blur(16px)',
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+              backdropFilter: 'blur(32px)',
+              boxShadow: '0 8px 32px 0 rgba(212, 169, 80, 0.1)',
             }}
           >
             {/* Decorative shimmer */}
-            <div className="absolute inset-0 shimmer pointer-events-none" />
+            <div className="absolute inset-0 shimmer pointer-events-none opacity-50" />
 
             <div className="relative">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#B8942E' }}>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(212, 169, 80, 0.12)' }}>
-                  <DollarSign className="w-4 h-4" style={{ color: '#D4A950' }} />
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-3" style={{ color: '#B8942E' }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-brand-gold/10">
+                  <DollarSign className="w-5 h-5" style={{ color: '#D4A950' }} />
                 </div>
                 السعر المتوقع
               </h2>
 
-              <div className="space-y-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">السعر الأساسي</span>
-                  <span className="text-foreground font-bold">50 د.ع</span>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-sm bg-white/50 px-4 py-3 border border-brand-gold/10 rounded-xl">
+                  <span className="text-muted-foreground font-bold">السعر الأساسي</span>
+                  <span className="text-foreground font-bold">5000 د.ع</span>
                 </div>
                 
                 <AnimatePresence>
                   {formData.serviceType && (
                     <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="flex justify-between items-center text-sm"
+                      initial={{ opacity: 0, height: 0, y: -10 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -10 }}
+                      className="flex justify-between items-center text-sm px-4 py-2"
                     >
                       <span className="text-muted-foreground">
                         نوع الخدمة ({services.find(s => s.value === formData.serviceType)?.label})
                       </span>
                       <span style={{ color: '#D4A950' }} className="font-bold">
-                        +{((estimatedPrice - 50 - uploadedFiles.length * 10) || 0).toFixed(0)} د.ع
+                        +{((estimatedPrice - 5000 - uploadedFiles.length * 1000) || 0).toFixed(0)} د.ع
                       </span>
                     </motion.div>
                   )}
@@ -400,30 +357,30 @@ export default function App() {
                 <AnimatePresence>
                   {uploadedFiles.length > 0 && (
                     <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="flex justify-between items-center text-sm"
+                      initial={{ opacity: 0, height: 0, y: -10 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -10 }}
+                      className="flex justify-between items-center text-sm px-4 py-2"
                     >
                       <span className="text-muted-foreground">الملفات ({uploadedFiles.length})</span>
-                      <span style={{ color: '#D4A950' }} className="font-bold">+{uploadedFiles.length * 10} د.ع</span>
+                      <span style={{ color: '#D4A950' }} className="font-bold">+{uploadedFiles.length * 1000} د.ع</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                <div className="border-t border-brand-gold/20 pt-4 mt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-foreground">المجموع</span>
+                <div className="border-t border-brand-gold/20 pt-5 mt-5">
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-xl font-bold text-foreground">المجموع</span>
                     <motion.span
                       key={estimatedPrice}
                       initial={{ scale: 1.2, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      className="text-3xl font-extrabold gold-gradient-text"
+                      className="text-4xl font-extrabold gold-gradient-text drop-shadow-sm"
                     >
                       {estimatedPrice.toFixed(0)} د.ع
                     </motion.span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-1 text-left">* السعر تقديري وقد يتغير حسب التفاصيل النهائية</p>
+                  <p className="text-xs text-muted-foreground mt-2 text-center opacity-80">* السعر تقديري وقد يتغير حسب التفاصيل النهائية</p>
                 </div>
               </div>
             </div>
@@ -434,40 +391,41 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="relative glass-card rounded-3xl p-6 shadow-xl overflow-hidden"
-            style={{ borderTop: '3px solid #0B3D6F' }}
+            className="relative glass-card rounded-3xl p-6 shadow-xl overflow-hidden group"
           >
+            <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-l from-brand-navy via-brand-crimson to-transparent opacity-50" />
             <div className="absolute inset-0 bg-gradient-to-br from-brand-navy/5 to-brand-crimson/5 pointer-events-none" />
 
             <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-bold text-brand-navy flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-brand-navy/10 flex items-center justify-center">
-                    <Mic className="w-4 h-4 text-brand-navy" />
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-brand-navy flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-brand-navy/10 flex items-center justify-center">
+                    <Mic className="w-5 h-5 text-brand-navy" />
                   </div>
                   الطلب الصوتي بالذكاء الاصطناعي
                 </h2>
-                <div className="bg-brand-navy/10 px-3 py-1 rounded-full flex items-center gap-1.5">
-                  <Lock className="w-3 h-3 text-brand-navy" />
+                <div className="bg-brand-navy/10 px-4 py-1.5 rounded-full flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-brand-navy" />
                   <span className="text-xs text-brand-navy font-bold">قريباً</span>
                 </div>
               </div>
 
-              <p className="text-muted-foreground text-sm mb-4">
+              <p className="text-muted-foreground text-sm mb-5 pr-2">
                 اطلب خدماتك بالصوت باستخدام تقنية الذكاء الاصطناعي المتقدمة
               </p>
 
-              <div className="bg-input-background rounded-2xl p-5 border border-brand-navy/10">
-                <div className="flex items-center justify-center gap-4 opacity-35">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-navy to-brand-crimson flex items-center justify-center shadow-lg">
-                    <Mic className="w-7 h-7 text-white" />
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-brand-navy/10 shadow-inner">
+                <div className="flex items-center justify-center gap-6 opacity-40">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-navy to-brand-crimson flex items-center justify-center shadow-lg">
+                    <Mic className="w-8 h-8 text-white relative z-10" />
+                    <div className="absolute inset-0 rounded-full border-2 border-white/20 animate-ping" />
                   </div>
-                  <div className="flex gap-1.5 items-end">
-                    {[8, 6, 10, 7, 9, 5, 8].map((h, i) => (
+                  <div className="flex gap-2 items-end">
+                    {[10, 8, 14, 9, 12, 7, 10].map((h, i) => (
                       <div
                         key={i}
-                        className="w-1 rounded-full bg-brand-navy animate-pulse"
-                        style={{ height: `${h * 3}px`, animationDelay: `${i * 0.1}s` }}
+                        className="w-1.5 rounded-full bg-brand-navy animate-pulse"
+                        style={{ height: `${h * 3.5}px`, animationDelay: `${i * 0.15}s` }}
                       />
                     ))}
                   </div>
@@ -481,28 +439,28 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            whileHover={{ scale: 1.02, boxShadow: '0 12px 40px -8px rgba(196, 30, 48, 0.35)' }}
+            whileHover={{ scale: 1.02, boxShadow: '0 12px 40px -8px rgba(196, 30, 48, 0.4)' }}
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-2xl font-bold text-lg shadow-xl transition-all flex items-center justify-center gap-3 text-white relative overflow-hidden disabled:opacity-70"
+            className="w-full py-5 rounded-2xl font-bold text-xl shadow-xl transition-all flex items-center justify-center gap-3 text-white relative overflow-hidden disabled:opacity-70 mt-4"
             style={{
               background: 'linear-gradient(135deg, #C41E30 0%, #E8364A 50%, #C41E30 100%)',
               boxShadow: '0 8px 32px -8px rgba(196, 30, 48, 0.3)',
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_3s_infinite]" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
             {isSubmitting ? (
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full"
+                className="w-7 h-7 border-3 border-white/30 border-t-white rounded-full"
               />
             ) : (
               <>
-                <Package className="w-5 h-5" />
-                تقديم الطلب
-                <Sparkles className="w-4 h-4 opacity-60" />
+                <Package className="w-6 h-6" />
+                تقديم الطلب الآن
+                <Sparkles className="w-5 h-5 opacity-60 ml-2" />
               </>
             )}
           </motion.button>
@@ -515,17 +473,17 @@ export default function App() {
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className="fixed bottom-6 left-4 right-4 max-w-lg mx-auto z-50 glass-card rounded-2xl p-4 shadow-2xl flex items-center gap-3"
-              style={{ borderRight: '4px solid #2A9D8F' }}
+              className="fixed bottom-6 left-4 right-4 max-w-lg mx-auto z-50 glass-card rounded-2xl p-5 shadow-2xl flex items-center gap-4 bg-white/90"
+              style={{ borderRight: '5px solid #2A9D8F' }}
             >
-              <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <div>
-                <p className="font-bold text-foreground text-sm">تم تقديم الطلب بنجاح!</p>
-                <p className="text-muted-foreground text-xs">سيتم التواصل معك خلال 24 ساعة</p>
+                <p className="font-bold text-brand-navy text-base">تم تقديم الطلب بنجاح!</p>
+                <p className="text-muted-foreground text-sm mt-0.5">سيتم التواصل معك خلال 24 ساعة لتأكيد التفاصيل</p>
               </div>
             </motion.div>
           )}
@@ -536,11 +494,11 @@ export default function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-10 text-center pb-8"
+          className="mt-12 text-center pb-8"
         >
-          <div className="w-16 h-0.5 mx-auto mb-4 rounded-full" style={{ background: 'linear-gradient(90deg, #0B3D6F, #D4A950, #C41E30)' }} />
-          <p className="text-muted-foreground text-xs">© 2026 Al-Rubeiy Group</p>
-          <p className="text-muted-foreground/60 text-[10px] mt-1">مجموعة الربيعي - جميع الحقوق محفوظة</p>
+          <div className="w-20 h-0.5 mx-auto mb-5 rounded-full opacity-60" style={{ background: 'linear-gradient(90deg, #0B3D6F, #D4A950, #C41E30)' }} />
+          <p className="text-muted-foreground font-bold text-xs uppercase tracking-wider mb-2">Al-Rubeiy Group</p>
+          <p className="text-muted-foreground/60 text-xs">مجموعة الربيعي للطباعة - جميع الحقوق محفوظة © 2026</p>
         </motion.footer>
       </div>
     </div>
