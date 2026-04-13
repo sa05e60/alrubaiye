@@ -29,7 +29,7 @@ export default function App() {
   const mouseY = useMotionValue(typeof window !== "undefined" ? window.innerHeight / 2 : 500);
   const smoothX = useSpring(mouseX, { damping: 50, stiffness: 400 });
   const smoothY = useSpring(mouseY, { damping: 50, stiffness: 400 });
-  const backgroundGlow = useMotionTemplate`radial-gradient(600px circle at ${smoothX}px ${smoothY}px, rgba(11, 61, 111, 0.08), transparent 80%)`;
+  const backgroundGlow = useMotionTemplate`radial-gradient(800px circle at ${smoothX}px ${smoothY}px, rgba(11, 61, 111, 0.15), transparent 80%)`;
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -95,19 +95,33 @@ export default function App() {
       {/* Brand stripe at top */}
       <div className="brand-stripe fixed top-0 left-0 right-0 z-50" />
 
+      {/* Dynamic colorful background */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#F8FAFC]">
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[30%] -right-[10%] w-[70vw] h-[70vw] rounded-full mix-blend-multiply filter blur-[120px] opacity-20"
+          style={{ background: 'radial-gradient(circle, #C41E30 0%, transparent 70%)' }} 
+        />
+        <motion.div 
+          animate={{ rotate: -360 }}
+          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[20%] -left-[10%] w-[60vw] h-[60vw] rounded-full mix-blend-multiply filter blur-[120px] opacity-20"
+          style={{ background: 'radial-gradient(circle, #D4A950 0%, transparent 70%)' }} 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], x: [0, 50, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] left-[20%] w-[50vw] h-[50vw] rounded-full mix-blend-multiply filter blur-[120px] opacity-15"
+          style={{ background: 'radial-gradient(circle, #0B3D6F 0%, transparent 70%)' }} 
+        />
+      </div>
+
       {/* Interactive mouse tracking background glow */}
       <motion.div 
-        className="fixed inset-0 pointer-events-none z-0" 
+        className="fixed inset-0 pointer-events-none z-0 mix-blend-color-burn" 
         style={{ background: backgroundGlow }} 
       />
-
-      {/* Static decorative background orbs (subtle) */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-[0.03]" 
-          style={{ background: 'radial-gradient(circle, #C41E30 0%, transparent 70%)' }} />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full opacity-[0.03]" 
-          style={{ background: 'radial-gradient(circle, #D4A950 0%, transparent 70%)' }} />
-      </div>
 
       <div className="relative z-10 max-w-lg mx-auto px-4 py-8 pt-10">
         {/* Header with logo */}
