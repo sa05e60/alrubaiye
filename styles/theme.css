@@ -1,0 +1,400 @@
+@custom-variant dark (&:is(.dark *));
+
+/* ======================================================================
+   AL-RUBEIY GROUP — LIGHT THEME
+   Primary: Deep Navy #0B3D6F  |  Accent: Crimson #C41E30  |  Gold: #D4A950
+   ====================================================================== */
+:root {
+  --font-size: 16px;
+  --button-outline: rgba(0,0,0, .10);
+  --badge-outline: rgba(0,0,0, .05);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(0,0,0, .03);
+  --elevate-2: rgba(0,0,0, .08);
+
+  /* Backgrounds — Cool white with blue undertone */
+  --background: hsl(210 25% 97%);
+  --foreground: hsl(210 50% 10%);
+  --border: hsl(210 20% 90%);
+
+  /* Cards — Pure white */
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(210 50% 10%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(210 50% 10%);
+
+  /* Primary — Al-Rubeiy Deep Navy */
+  --primary: hsl(210 80% 24%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  /* Secondary — Lighter navy */
+  --secondary: hsl(210 60% 94%);
+  --secondary-foreground: hsl(210 80% 24%);
+
+  /* Muted */
+  --muted: hsl(210 20% 93%);
+  --muted-foreground: hsl(210 15% 46%);
+
+  /* Accent — Crimson Red warmth */
+  --accent: hsl(355 72% 95%);
+  --accent-foreground: hsl(355 72% 40%);
+
+  /* Destructive */
+  --destructive: hsl(355 72% 44%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  /* Input */
+  --input: hsl(210 20% 90%);
+  --input-background: hsl(210 25% 98%);
+  --switch-background: hsl(210 20% 85%);
+  --ring: hsl(210 80% 24%);
+
+  /* Font weights */
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  /* Charts — Brand-aligned palette */
+  --chart-1: hsl(210 80% 24%);
+  --chart-2: hsl(355 72% 44%);
+  --chart-3: hsl(42 60% 56%);
+  --chart-4: hsl(160 50% 42%);
+  --chart-5: hsl(210 30% 60%);
+
+  /* Radius */
+  --radius: 0.625rem;
+
+  /* Sidebar — Deep Navy */
+  --sidebar: hsl(210 78% 14%);
+  --sidebar-foreground: hsl(210 15% 85%);
+  --sidebar-primary: hsl(42 60% 56%);
+  --sidebar-primary-foreground: hsl(210 78% 12%);
+  --sidebar-accent: hsl(210 60% 20%);
+  --sidebar-accent-foreground: hsl(210 10% 95%);
+  --sidebar-border: hsl(210 60% 18%);
+  --sidebar-ring: hsl(42 60% 56%);
+
+  /* Typography */
+  --app-font-sans: 'Almarai', system-ui, sans-serif;
+  --app-font-serif: Georgia, serif;
+  --app-font-mono: 'JetBrains Mono', monospace;
+
+  /* Shadows — refined with navy tint */
+  --shadow-2xs: 0px 1px 2px 0px hsl(210 60% 12% / 0.04);
+  --shadow-xs: 0px 1px 3px 0px hsl(210 60% 12% / 0.06);
+  --shadow-sm: 0px 1px 3px 0px hsl(210 60% 12% / 0.06), 0px 1px 2px -1px hsl(210 60% 12% / 0.06);
+  --shadow: 0px 2px 4px 0px hsl(210 60% 12% / 0.06), 0px 1px 3px -1px hsl(210 60% 12% / 0.05);
+  --shadow-md: 0px 4px 6px -1px hsl(210 60% 12% / 0.07), 0px 2px 4px -2px hsl(210 60% 12% / 0.05);
+  --shadow-lg: 0px 8px 16px -3px hsl(210 60% 12% / 0.08), 0px 4px 6px -4px hsl(210 60% 12% / 0.04);
+  --shadow-xl: 0px 16px 32px -5px hsl(210 60% 12% / 0.10), 0px 8px 10px -6px hsl(210 60% 12% / 0.04);
+  --shadow-2xl: 0px 24px 48px -8px hsl(210 60% 12% / 0.15);
+}
+
+/* ======================================================================
+   AL-RUBEIY GROUP — DARK THEME
+   ====================================================================== */
+.dark {
+  --button-outline: rgba(255,255,255, .10);
+  --badge-outline: rgba(255,255,255, .05);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255,255,255, .04);
+  --elevate-2: rgba(255,255,255, .09);
+
+  --background: hsl(210 45% 7%);
+  --foreground: hsl(210 15% 95%);
+
+  --border: hsl(210 30% 15%);
+  --input: hsl(210 30% 18%);
+  --ring: hsl(210 70% 45%);
+
+  --card: hsl(210 42% 10%);
+  --card-foreground: hsl(210 15% 95%);
+
+  --popover: hsl(210 42% 10%);
+  --popover-foreground: hsl(210 15% 95%);
+
+  --primary: hsl(210 70% 50%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --secondary: hsl(210 35% 16%);
+  --secondary-foreground: hsl(210 15% 90%);
+
+  --muted: hsl(210 25% 14%);
+  --muted-foreground: hsl(210 12% 60%);
+
+  --accent: hsl(355 50% 16%);
+  --accent-foreground: hsl(355 72% 65%);
+
+  --destructive: hsl(0 62% 40%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  /* Sidebar — Even deeper navy */
+  --sidebar: hsl(210 55% 7%);
+  --sidebar-foreground: hsl(210 15% 80%);
+  --sidebar-border: hsl(210 40% 13%);
+  --sidebar-primary: hsl(42 55% 52%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(210 40% 14%);
+  --sidebar-accent-foreground: hsl(210 10% 92%);
+  --sidebar-ring: hsl(42 55% 52%);
+
+  --chart-1: hsl(210 70% 50%);
+  --chart-2: hsl(355 65% 55%);
+  --chart-3: hsl(42 55% 52%);
+  --chart-4: hsl(160 45% 45%);
+  --chart-5: hsl(210 25% 55%);
+
+  --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.4);
+  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.5);
+  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.5), 0px 1px 2px -1px hsl(0 0% 0% / 0.5);
+  --shadow: 0px 2px 4px 0px hsl(0 0% 0% / 0.5), 0px 1px 3px -1px hsl(0 0% 0% / 0.5);
+  --shadow-md: 0px 4px 6px -1px hsl(0 0% 0% / 0.5), 0px 2px 4px -2px hsl(0 0% 0% / 0.5);
+  --shadow-lg: 0px 8px 16px -3px hsl(0 0% 0% / 0.5), 0px 4px 6px -4px hsl(0 0% 0% / 0.5);
+  --shadow-xl: 0px 16px 32px -5px hsl(0 0% 0% / 0.5), 0px 8px 10px -6px hsl(0 0% 0% / 0.5);
+  --shadow-2xl: 0px 24px 48px -8px hsl(0 0% 0% / 0.6);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Al-Rubeiy brand color tokens */
+  --color-brand-navy: #0B3D6F;
+  --color-brand-crimson: #C41E30;
+  --color-brand-gold: #D4A950;
+  --color-brand-navy-light: #1A5A9E;
+  --color-brand-crimson-light: #E8364A;
+
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+}
+
+/* ======================================================================
+   BASE LAYER
+   ====================================================================== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: var(--app-font-sans);
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
+
+/* ======================================================================
+   AL-RUBEIY BRAND UTILITIES
+   ====================================================================== */
+
+/* Brand gradient stripe — used at top of headers */
+.brand-stripe {
+  background: linear-gradient(90deg, #0B3D6F 0%, #1A5A9E 40%, #C41E30 70%, #D4A950 100%);
+  height: 3px;
+  width: 100%;
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px hsl(210 60% 12% / 0.12), 0 4px 8px -4px hsl(210 60% 12% / 0.06);
+}
+.dark .card-hover:hover {
+  box-shadow: 0 8px 24px -4px hsl(0 0% 0% / 0.4), 0 4px 8px -4px hsl(0 0% 0% / 0.3);
+}
+
+/* Glassmorphism card */
+.glass-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.dark .glass-card {
+  background: rgba(11, 61, 111, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Brand gradient text */
+.brand-gradient-text {
+  background: linear-gradient(135deg, #0B3D6F 0%, #1A5A9E 50%, #C41E30 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Gold gradient text */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #D4A950 0%, #E8C96C 50%, #D4A950 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Avatar ring gradient */
+.avatar-ring {
+  background: linear-gradient(135deg, #D4A950, #C41E30, #0B3D6F);
+  padding: 2px;
+  border-radius: 50%;
+}
+.avatar-ring > * {
+  border-radius: 50%;
+}
+
+/* Pulse animation for urgent badge */
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.badge-urgent {
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+
+/* Animated fade-in-up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.3s; }
+.animate-delay-4 { animation-delay: 0.4s; }
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(212, 169, 80, 0.1) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(210 20% 80%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(210 20% 65%);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(210 20% 25%);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(210 20% 35%);
+}
+
+/* Selection highlight */
+::selection {
+  background: rgba(11, 61, 111, 0.2);
+  color: inherit;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid hsl(210 80% 24%);
+  outline-offset: 2px;
+}
